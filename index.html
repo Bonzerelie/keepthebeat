@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Got Rhythm — Simple</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1 class="app-title">Got Rhythm 🥁</h1>
+      <p class="app-subtitle-large">Lock in • Stay on beat</p>
+      <p class="app-subtitle">
+        Pick a rhythm, press <strong>Begin Game</strong>, and play along as it loops.<br/>
+        Use <strong>Kick</strong> (⬅️) and <strong>Snare</strong> (➡️). Press <strong>Space</strong> to Pause / Continue.
+      </p>
+    </header>
+
+    <section class="controlsPanel controlsPanelActions" aria-label="game controls">
+      <div class="actionsRow actionsCentered wrapTight">
+        <button id="beginBtn" type="button" class="primary pulse">Begin Game</button>
+        <button id="pauseBtn" type="button" disabled>Pause</button>
+        <button id="stopBtn" type="button" disabled>Stop / Reset</button>
+
+        <button id="openRhythmBtn" type="button">Select Rhythm</button>
+        <button id="openMetroBtn" type="button">Select Metronome</button>
+
+        <button id="downloadScoreBtn" type="button">Download Scorecard</button>
+        <button id="infoBtn" type="button">Information</button>
+      </div>
+    </section>
+
+    <section class="statusPanel" aria-label="status">
+      <div class="statusRow">
+        <div class="beatLights" aria-label="beat indicator">
+          <div class="beatDot" id="beatDot1"></div>
+          <div class="beatDot" id="beatDot2"></div>
+          <div class="beatDot" id="beatDot3"></div>
+          <div class="beatDot" id="beatDot4"></div>
+        </div>
+
+        <div class="statusText">
+          <div class="phaseTitle" id="phaseTitle">Ready</div>
+          <div class="phaseSub" id="phaseSub">Press <strong>Begin Game</strong> to start.</div>
+        </div>
+      </div>
+
+      <div class="scoreInline">
+        <div class="scorePill">
+          <span class="scoreLabel">Average</span>
+          <span class="scoreValue" id="avgScoreOut">—</span>
+        </div>
+        <div class="scorePill">
+          <span class="scoreLabel">Last</span>
+          <span class="scoreValue" id="lastScoreOut">—</span>
+        </div>
+        <div class="scorePill">
+          <span class="scoreLabel">Beats</span>
+          <span class="scoreValue" id="roundsOut">0</span>
+        </div>
+        <div class="scorePill">
+          <span class="scoreLabel">Avg ms</span>
+          <span class="scoreValue" id="avgMsOut">—</span>
+        </div>
+        <div class="scorePill">
+          <span class="scoreLabel">Best ms</span>
+          <span class="scoreValue" id="bestMsOut">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="padsPanel" aria-label="drum pads">
+      <div class="padsRow">
+        <button id="kickBtn" type="button" class="padBtn kickPad" disabled>
+          <img src="images/kick.png" alt="" class="padIcon" />
+          <span class="padText">Kick</span>
+          <span class="padKey">⬅️</span>
+        </button>
+
+        <button id="snareBtn" type="button" class="padBtn snarePad" disabled>
+          <img src="images/snare.png" alt="" class="padIcon" />
+          <span class="padText">Snare</span>
+          <span class="padKey">➡️</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="analysis" aria-label="feedback">
+      <div class="analysisGrid">
+        <div class="analysisCard fixedFeedbackCard" id="feedbackCard">
+          <div class="analysisLabel">Live Accuracy</div>
+          <div class="analysisBody" id="feedbackOut" aria-live="polite">
+            Press <strong>Begin Game</strong> to start.
+          </div>
+
+          <!-- kept in DOM for compatibility, but visually hidden in CSS -->
+          <div class="scoreBarWrap" aria-hidden="true">
+            <div class="scoreBar" id="scoreBar"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="endnotes"></footer>
+  </div>
+
+  <!-- Info modal -->
+  <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="modalCard" role="document">
+      <div class="modalHeader">
+        <h2 id="infoTitle">More information 🧐</h2>
+      </div>
+      <div class="modalBody">
+        <p>
+          The selected 4-beat rhythm loops continuously.<br/>
+          Watch the 4 green circles and try to lock your hits to the beat.
+        </p>
+        <p>
+          Controls: ⬅️ Kick, ➡️ Snare, <strong>Space</strong> Pause/Continue.
+        </p>
+      </div>
+      <div class="modalFooter">
+        <button id="infoOk" type="button" class="primary">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rhythm modal -->
+  <div id="rhythmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rhythmTitle">
+    <div class="modalCard" role="document">
+      <div class="modalHeader">
+        <h2 id="rhythmTitle">Select Rhythm 🥁</h2>
+      </div>
+      <div class="modalBody">
+        <div class="modalControl">
+          <label class="inlineLabel" for="rhythmSel">Rhythm</label>
+          <select id="rhythmSel" class="compactSelect">
+            <option value="r1">Rhythm 1 — Kick • • Kick •</option>
+            <option value="r2">Rhythm 2 — Kick • Snare •</option>
+            <option value="r3">Rhythm 3 — Kick Kick Kick Kick</option>
+            <option value="r4">Rhythm 4 — Kick Snare Kick Snare</option>
+          </select>
+        </div>
+      </div>
+      <div class="modalFooter modalActionsLeftRight">
+        <button id="rhythmCancel" type="button">Close</button>
+        <button id="rhythmOk" type="button" class="primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metronome modal -->
+  <div id="metroModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="metroTitle">
+    <div class="modalCard" role="document">
+      <div class="modalHeader">
+        <h2 id="metroTitle">Select Metronome ⏱️</h2>
+      </div>
+      <div class="modalBody">
+        <div class="modalControl">
+          <label class="inlineLabel" for="bpmRange">Metronome (BPM)</label>
+          <div class="bpmRow bpmRowWide">
+            <input id="bpmRange" type="range" min="40" max="140" value="90" />
+            <input id="bpmNum" type="number" min="40" max="140" value="90" />
+          </div>
+        </div>
+      </div>
+      <div class="modalFooter modalActionsLeftRight">
+        <button id="metroCancel" type="button">Close</button>
+        <button id="metroOk" type="button" class="primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stop/summary modal -->
+  <div class="modal hidden" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+    <div class="modalCard">
+      <div class="modalTitle" id="summaryTitle">Score Summary</div>
+      <div class="modalBody" id="summaryBody">—</div>
+      <div class="modalActions">
+        <button id="summaryDownload" type="button">Download Score PNG</button>
+        <button id="summaryClose" type="button" class="primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
