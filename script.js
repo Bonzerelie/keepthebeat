@@ -83,12 +83,14 @@
   
     // ---------------- iframe sizing ----------------
     let lastHeight = 0;
+    const HEIGHT_BUFFER = 20; // Prevents scrollbar flickering
+  
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const height = Math.ceil(entry.contentRect.height);
-        if (height !== lastHeight) {
-          parent.postMessage({ iframeHeight: height }, "*");
-          lastHeight = height;
+        const h = Math.ceil(entry.contentRect.height) + HEIGHT_BUFFER;
+        if (h !== lastHeight) {
+          parent.postMessage({ iframeHeight: h }, "*");
+          lastHeight = h;
         }
       }
     });
@@ -99,8 +101,12 @@
         const h = Math.max(
           document.documentElement.scrollHeight,
           document.body ? document.body.scrollHeight : 0
-        );
-        parent.postMessage({ iframeHeight: h }, "*");
+        ) + HEIGHT_BUFFER;
+        
+        if (h !== lastHeight) {
+          parent.postMessage({ iframeHeight: h }, "*");
+          lastHeight = h;
+        }
       } catch {}
     }
   
@@ -249,7 +255,7 @@
     // ---------------- UI helpers ----------------
     function setFeedback(html) {
       feedbackOut.innerHTML = html || "";
-      postHeightNow();
+      // postHeightNow() removed here to prevent infinite resizing loop!
     }
   
     function setPhase(title, sub) {
